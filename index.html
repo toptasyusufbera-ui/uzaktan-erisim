@@ -3,162 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKY WOLF // MOBILE TACTICAL HUD</title>
+    <title>SKY WOLF // TACTICAL COMMAND INTERFACE</title>
     <style>
         :root {
             --matrix-bg: #010810;
             --primary-hud: #00f0ff;
             --ready-state: #ff00dd;
-            --search-state: #ffcc00;
             --alert-red: #ff3300;
-            --panel-glass: rgba(2, 12, 24, 0.85);
+            --panel-glass: rgba(2, 12, 24, 0.9);
         }
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             background-color: var(--matrix-bg);
             color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* Siber Arka Plan Izgarası */
         .grid-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(0, 27, 41, 0.3) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 27, 41, 0.3) 1px, transparent 1px);
-            background-size: 30px 30px;
-            z-index: -1;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 27, 41, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 27, 41, 0.2) 1px, transparent 1px);
+            background-size: 25px 25px; z-index: -1;
         }
 
         .hud-container {
-            width: 90%;
-            max-width: 450px;
+            width: 90%; max-width: 480px;
             background: var(--panel-glass);
             border: 2px solid var(--primary-hud);
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 0 25px rgba(0, 240, 255, 0.15);
+            border-radius: 8px; padding: 20px;
+            margin-top: 20px; box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
             text-align: center;
-            position: relative;
         }
 
-        h1 {
-            font-family: 'Agency FB', sans-serif;
-            font-size: 28px;
-            letter-spacing: 4px;
-            margin: 0 0 5px 0;
-            color: #fff;
-            text-shadow: 0 0 10px var(--primary-hud);
-        }
+        h1 { font-family: 'Agency FB', sans-serif; font-size: 26px; letter-spacing: 3px; margin: 0; text-shadow: 0 0 10px var(--primary-hud); }
+        .subtitle { font-size: 10px; color: var(--primary-hud); letter-spacing: 2px; margin-bottom: 15px; }
 
-        .subtitle {
-            font-size: 11px;
-            color: var(--primary-hud);
-            letter-spacing: 2px;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-        }
-
-        /* Durum Göstergesi */
-        .status-box {
-            border: 1px dashed var(--primary-hud);
-            padding: 10px;
-            margin-bottom: 25px;
-            font-size: 13px;
-            background: rgba(0, 240, 255, 0.02);
-        }
-        #status-text {
-            color: var(--ready-state);
-            font-weight: bold;
-        }
-
-        /* Taktik Buton Matrisi */
-        .control-grid {
-            display: grid;
-            grid-template-columns: 1px 1px; /* Boşluk yönetimi */
-            grid-auto-rows: auto;
-            gap: 15px;
-            display: flex;
-            flex-direction: column;
-        }
-
+        .control-grid { display: flex; flex-direction: column; gap: 10px; }
         .btn-tactic {
-            background: rgba(1, 24, 40, 0.6);
-            border: 1px solid var(--primary-hud);
-            color: #ffffff;
-            padding: 15px;
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            border-radius: 4px;
+            background: rgba(1, 24, 40, 0.6); border: 1px solid var(--primary-hud);
+            color: #ffffff; padding: 12px; font-size: 13px; font-weight: bold;
+            cursor: pointer; transition: all 0.3s; border-radius: 4px; text-align: left;
         }
+        .btn-tactic:hover { background: var(--primary-hud); color: var(--matrix-bg); box-shadow: 0 0 10px var(--primary-hud); }
+        .btn-lock { border-color: var(--alert-red); background: rgba(40, 5, 5, 0.4); text-align: center;}
+        .btn-lock:hover { background: var(--alert-red); color: white; box-shadow: 0 0 10px var(--alert-red); }
 
-        .btn-tactic:hover {
-            background: var(--primary-hud);
-            color: var(--matrix-bg);
-            box-shadow: 0 0 15px var(--primary-hud);
+        /* SÜREÇ RADARI (YENİ PENCERE PANELİ) */
+        .process-panel {
+            width: 90%; max-width: 480px;
+            background: var(--panel-glass);
+            border: 1px solid var(--ready-state);
+            border-radius: 8px; padding: 15px;
+            margin-top: 15px; margin-bottom: 25px;
+            box-shadow: 0 0 15px rgba(255, 0, 221, 0.1);
         }
-
-        /* Kritik Savunma Butonu */
-        .btn-lock {
-            border-color: var(--alert-red);
-            color: #fff;
-            background: rgba(40, 5, 5, 0.4);
+        .process-title {
+            font-family: 'Agency FB', sans-serif; font-size: 16px;
+            color: var(--ready-state); letter-spacing: 2px; margin-bottom: 10px; text-align: left;
+            border-bottom: 1px dashed rgba(255, 0, 221, 0.3); padding-bottom: 5px;
         }
-        .btn-lock:hover {
-            background: var(--alert-red);
-            color: #fff;
-            box-shadow: 0 0 15px var(--alert-red);
+        .process-list {
+            display: flex; flex-direction: column; gap: 6px;
+            max-height: 200px; overflow-y: auto; padding-right: 5px;
         }
-
-        /* Ses Barı Konteyneri */
-        .slider-container {
-            margin-top: 30px;
-            border-top: 1px solid rgba(0, 240, 255, 0.2);
-            padding-top: 20px;
+        .process-item {
+            background: rgba(15, 2, 20, 0.5); border: 1px solid rgba(255, 0, 221, 0.4);
+            padding: 10px; font-size: 12px; border-radius: 4px; text-align: left;
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.2s;
         }
-
-        .slider-label {
-            font-size: 12px;
-            color: var(--text-intel);
-            margin-bottom: 8px;
-            letter-spacing: 1px;
+        .process-item:hover {
+            border-color: var(--alert-red); background: rgba(255, 51, 0, 0.15);
+            color: var(--alert-red);
         }
-
-        .volume-slider {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 6px;
-            background: #011828;
-            border: 1px solid var(--primary-hud);
-            outline: none;
-            border-radius: 3px;
+        .process-item::after {
+            content: "İLETIŞIMI KES [X]"; font-size: 9px; font-weight: bold; color: rgba(255,255,255,0.4);
         }
-
-        .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            background: var(--primary-hud);
-            cursor: pointer;
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--primary-hud);
-        }
+        .process-item:hover::after { color: var(--alert-red); }
     </style>
 </head>
 <body>
@@ -167,74 +90,68 @@
 
     <div class="hud-container">
         <h1>SKY WOLF</h1>
-        <div class="subtitle">Tactical Link Protocol // v42.0</div>
-
-        <div class="status-box">
-            SİNYAL DURUMU: <span id="status-text">BAĞLANTI HAZIR</span>
-        </div>
-
+        <div class="subtitle">Tactical Link Protocol // v44.0</div>
+        
         <div class="control-grid">
             <button class="btn-tactic" onclick="emirGonder('foto')">📷 SİBER GÖZ (FOTOĞRAF)</button>
             <button class="btn-tactic" onclick="emirGonder('video_kayit')">📹 UZAKTAN VİDEO RADARI (5 SN)</button>
             <button class="btn-tactic" onclick="emirGonder('ses_kayit')">🎙️ ORTAM AKUSTİK KAYDI (5 SN)</button>
             <button class="btn-tactic btn-lock" onclick="emirGonder('lock')">🔒 SİSTEMİ ACİL KİLİTLE</button>
         </div>
+    </div>
 
-        <div class="slider-container">
-            <div class="slider-label">ANLIK SES TELEMETRİSİ: <span id="vol-val">50</span>%</div>
-            <input type="range" min="0" max="100" value="50" class="volume-slider" id="volSlider" oninput="sesGuncelle(this.value)">
+    <div class="process-panel">
+        <div class="process-title">🛰️ AÇIK SİSTEM SÜREÇLERİ / UYGULAMALAR</div>
+        <div class="process-list" id="pencereKutusu">
+            <div style="font-size:11px; color:gray; text-align:center; padding:10px;">Sinyal bekleniyor...</div>
         </div>
     </div>
 
     <script>
-        // Sizin Firebase URL Yolunuz
-        const FIREBASE_URL = "https://altay-43a7b-default-rtdb.firebaseio.com/sky_wolf_sistem/komut.json";
-
-        function durumGuncelle(metin, renk) {
-            const statusText = document.getElementById("status-text");
-            statusText.innerText = metin;
-            statusText.style.color = renk;
-        }
+        const BASE_URL = "https://altay-43a7b-default-rtdb.firebaseio.com/sky_wolf_sistem/";
 
         function emirGonder(emirAdi) {
-            durumGuncelle("VERİ PAKETİ FIRLATILIYOR...", "#ffcc00");
-            
-            const veri = {
-                emir: emirAdi,
-                durum: "beklemede"
-            };
-
-            fetch(FIREBASE_URL, {
+            fetch(`${BASE_URL}komut.json`, {
                 method: "PUT",
-                body: JSON.stringify(veri),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(res => {
-                if(res.ok) {
-                    durumGuncelle("EMİR SİLİNDİ / İLETİLDİ", "#00ff66");
-                    setTimeout(() => durumGuncelle("BAĞLANTI HAZIR", "#ff00dd"), 1500);
-                } else {
-                    durumGuncelle("BAĞLANTI HATASI", "#ff3300");
-                }
-            })
-            .catch(err => {
-                durumGuncelle("MATRİS SAPMASI", "#ff3300");
+                body: JSON.stringify({ emir: emirAdi, durum: "beklemede" }),
+                headers: { "Content-Type": "application/json" }
             });
         }
 
-        // Kaydırıcı hareket ettikçe Firebase'e "volume_X" paketi atar
-        let debounceTimer;
-        function sesGuncelle(deger) {
-            document.getElementById("vol-val").innerText = deger;
-            
-            clearTimeout(debounceTimer);
-            // Sunucuyu yormamak için parmağınızı durdurduğunuz an veriyi ateşler
-            debounceTimer = setTimeout(() => {
-                emirGonder("volume_" + deger);
-            }, 150);
+        function uygulamaKapat(pencereAdi) {
+            if(confirm(`'${pencereAdi}' uygulamasını uzaktan kapatmak istediğinize emin misiniz efendim?`)) {
+                emirGonder("kill_" + pencereAdi);
+            }
         }
+
+        // Firebase'den açık pencerelerin listesini canlı çeken döngü
+        function pencereleriCanliTara() {
+            fetch(`${BASE_URL}aktif_pencereler.json`)
+            .then(res => res.json())
+            .then(data => {
+                const kutu = document.getElementById("pencereKutusu");
+                kutu.innerHTML = "";
+                
+                if (data && Array.isArray(data) && data.length > 0) {
+                    data.forEach(unvan => {
+                        if(unvan) {
+                            const div = document.createElement("div");
+                            div.className = "process-item";
+                            div.innerText = unvan.length > 35 ? unvan.substring(0, 35) + "..." : unvan;
+                            div.onclick = () => uygulamaKapat(unvan);
+                            kutu.appendChild(div);
+                        }
+                    });
+                } else {
+                    kutu.innerHTML = `<div style="font-size:11px; color:gray; text-align:center; padding:10px;">Aktif görünür pencere yok.</div>`;
+                }
+            })
+            .catch(() => {});
+        }
+
+        // Her 3 saniyede bir web arayüzünü tazele
+        setInterval(pencereleriCanliTara, 3000);
+        pencereleriCanliTara();
     </script>
 </body>
 </html>
